@@ -1,0 +1,35 @@
+נוסיף לסימולציה יכולת של בניית גרף, משמע בזמן המעוף הרחפן בונה את הגרף באופן דינמי.
+
+בניית הגרף נוצרת כך מתי שזווית משנתה וגם מתי שעבר ברק זמן של 2 שניות וחצי ועם הוא לא בדריך חזרה הביתה 
+
+	if ((int) ran.getWeight() != finalSpin_by && System.currentTimeMillis()-ran.time>2222 && !SimulationWindow.return_home) {
+//					System.out.println("addNoed");
+					addNoed(dronePoint, finalSpin_by, lidar, lidar1, lidar2,System.currentTimeMillis()-ran.time);
+
+הנקודות נבנות כך :
+
+dronePoint			    	 - X,Y
+finalSpin_by				 - זויית
+lidar 					 - לזירה קדימה
+lidar1					 - שמולה
+lidar2					 -ימינה
+System.currentTimeMillis()-ran.time	 -הזמן שחלף מנקודה השניה עד עכשיו  
+
+פנקצית הבניה :
+private void addNoed(Point dronePoint, int finalSpin_by, Lidar lidar, Lidar lidar1, Lidar lidar2,double v) {
+	ran2 = new node(dronePoint.x,dronePoint.y, finalSpin_by, lidar.current_distance, lidar1.current_distance, lidar2.current_distance,v);
+		grap.getAlgoGraph().addNode(ran2);
+		grap.getAlgoGraph().connect(ran.getKey(), ran2.getKey(), Point3D.distance2D(ran.getLocation(), ran2.getLocation()));
+			ran2.setImportant_pointRigt(flag.toString());
+			flag = "no";
+			ran2.setImportant_pointleft(flag2.toString());
+			flag2 = "no";
+		ran=ran2;
+	}
+הFLAGS מסימין לי עם הנקודה יהיה נקודה מיוחד ועם כן אזה קווין יהיה השניות המיוחד 
+
+הגרף בונה לו צלעות אחרי כול נקודה שנספת לו מנקודה הקודמת יש לנו שתי השמפים אחד לנקודות והשניה לצעלות 
+לגרף יש יכולת מפוי דרכים לפי הקודקוים והצלעות ולמצא את הדריך הכי קצרה שם הפנקציה יהיה shortestPath
+
+
+
