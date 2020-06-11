@@ -435,15 +435,24 @@ public class AutoAlgo1 {
 				}
 			}
 		}
+
+
 		if (SimulationWindow.initGraph){
-		grap.save("text1");
-		Graph_Algo algo2 = new Graph_Algo();
-		algo2.init("text1");
-		System.out.println(algo2.toString());
+			grap.init("Grap-skimmer");
+
+//		grap.save("Grap-skimmer");
+//		Graph_Algo algo2 = new Graph_Algo();
+//		System.out.println(algo2.toString());
 //			grap=new Graph_Algo(file_name);
-		}
+
 	}
-	
+
+	if (SimulationWindow._SaveGraph){
+		grap.save("Grap-skimmer");
+	}
+}
+
+
 	int counter = 0;
 	
 	public void doLeftRight() {

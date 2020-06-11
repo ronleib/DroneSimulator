@@ -31,6 +31,7 @@ public class SimulationWindow {
 	public static boolean return_home = false;
 	public static boolean Suspicious_Point=false;
 	public static boolean initGraph = false;
+	public static boolean _SaveGraph = false;
 	boolean toogleStop = true;
 	private void initialize() {
 		frame = new JFrame();
@@ -223,7 +224,7 @@ public class SimulationWindow {
 			  {
 				  return_home = !return_home;
 				  algo1.speedDown();
-				  algo1.spinBy(180, true, new Func() {
+				  algo1.spinBy(-180, true, new Func() {
 						@Override
 						public void method() {
 							algo1.speedUp();
@@ -249,14 +250,14 @@ public class SimulationWindow {
 				});
 			}
 		});
-		Suspicious.setBounds(500, 500, 200, 50);
+		Suspicious.setBounds(1052, 500, 200, 50);
 		frame.getContentPane().add(Suspicious);
 
 		/*
 		 * Info label 
 		 */
-		JButton Graph = new JButton("initGraph");
-		Graph.addActionListener(new ActionListener()
+		JButton initGraphJB = new JButton("initGraph");
+		initGraphJB.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -268,8 +269,25 @@ public class SimulationWindow {
 				initGraph = !initGraph;
 		}
 		});
-		Graph.setBounds(500, 560, 100, 50);
-		frame.getContentPane().add(Graph);
+
+		initGraphJB.setBounds(900, 550, 100, 50);
+		frame.getContentPane().add(initGraphJB);
+
+		JButton SaveGraph = new JButton("Save_Graph_JSON");
+		SaveGraph.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if(_SaveGraph) {
+					CPU.stopAllCPUS();
+				} else {
+					CPU.resumeAllCPUS();
+				}
+				_SaveGraph = !_SaveGraph;
+			}
+		});
+		SaveGraph.setBounds(1000, 550, 170, 50);
+		frame.getContentPane().add(SaveGraph);
 		
 		info_label = new JLabel();
 		info_label.setBounds(1300, 500, 300, 200);
