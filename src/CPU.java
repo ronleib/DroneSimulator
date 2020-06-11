@@ -5,7 +5,7 @@ import java.util.function.IntConsumer;
 public class CPU{
 	public int hz ; 
 	public List<IntConsumer> functions_list;
-	public boolean isPlay;
+	private boolean isPlay;
 	private long elapsedMilli;
 	private boolean isPlayedBeforeStop;
 	public static List<CPU> all_cpus = null;

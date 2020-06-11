@@ -60,8 +60,8 @@ public class Graph_Algo implements graph_algorithms {
 	}
 
 	public void initJson(String graphString) {
-		int nodeID = 0, edgesStart = 0, edgesEnd = 0;
-		double weight = 0;
+		int nodeID = 0, edgesStart = 0, edgesEnd = 0, Spin = 0;
+		double weight = 0, Straight = 0, Left = 0, Right = 0,TimeOfEdge=0;
 		String point = "";
 		try {
 			this.Graph_Algo();
@@ -70,10 +70,15 @@ public class Graph_Algo implements graph_algorithms {
 			JSONArray edges = graph.getJSONArray("Edges");
 
 			for (int i = 0; i < nodes.length(); i++) {
-				nodeID = nodes.getJSONObject(i).getInt("id");
-				point = nodes.getJSONObject(i).getString("pos");
-				Point3D p = new Point3D(point);
-				node temp = new node(p.x(), p.y());
+				nodeID 		= nodes.getJSONObject(i).getInt("ID");
+				point 		= nodes.getJSONObject(i).getString("point");
+				Spin 		= nodes.getJSONObject(i).getInt("Spin");
+				Straight 	= nodes.getJSONObject(i).getDouble("Straight");
+				Left 		= nodes.getJSONObject(i).getDouble("Left");
+				Right 		= nodes.getJSONObject(i).getDouble("Right");
+				TimeOfEdge	= nodes.getJSONObject(i).getDouble("TimeOfEdge");
+				Point3D p 	= new Point3D(point);
+				node temp 	= new node(p.x(), p.y(),Spin,Straight,Left,Right,TimeOfEdge);
 				temp.setID(nodeID);
 				this.algoGraph.getNodeMap().put(nodeID, temp);
 			}
@@ -90,17 +95,28 @@ public class Graph_Algo implements graph_algorithms {
 	}
 
 	public String saveJSON() {
-		String point, nodeID, start, end, weight;
+		String point, nodeID, start, end, weight, Spin, Straight, Left, Right,TimeOfEdge;
+		;
 		JSONObject grap = new JSONObject();
 		JSONArray edgeArray = new JSONArray();
 		JSONArray nodeArray = new JSONArray();
 		try {
 			for (int x : this.algoGraph.getNodeMap().keySet()) {
-				point = this.algoGraph.getNodeMap().get(x).getLocation().toString();
+				point	 	= this.algoGraph.getNodeMap().get(x).getLocation().toString();
+				Spin		= String.valueOf(this.algoGraph.getNodeMap().get(x).getSpin());
+				Straight 	= String.valueOf(this.algoGraph.getNodeMap().get(x).getStraight());
+				Left 	 	= String.valueOf(this.algoGraph.getNodeMap().get(x).getLeft());
+				Right 	 	= String.valueOf(this.algoGraph.getNodeMap().get(x).getRight());
+				TimeOfEdge	= String.valueOf(this.algoGraph.getNodeMap().get(x).getTimeOfEdge());
 				nodeID = "" + x;
 				JSONObject node = new JSONObject();
 				node.put("ID", nodeID);
 				node.put("point", point);
+				node.put("Spin", Spin);
+				node.put("Straight", Straight);
+				node.put("Left", Left);
+				node.put("Right", Right);
+				node.put("TimeOfEdge", TimeOfEdge);
 				nodeArray.put(node);
 			}
 			for (int x : this.algoGraph.getNeighbore().keySet()) {

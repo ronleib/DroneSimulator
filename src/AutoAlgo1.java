@@ -1,15 +1,11 @@
 import graph.algorithms.Graph_Algo;
-import graph.dataStructure.DGraph;
-import graph.dataStructure.Point3D;
 import graph.dataStructure.node;
 import graph.dataStructure.node_data;
 
-import javax.tools.Tool;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 
 public class AutoAlgo1 {
 	
@@ -27,8 +23,8 @@ public class AutoAlgo1 {
 	ArrayList<Func> degrees_left_func;
 	
 	boolean isSpeedUp = false;
-	
-	//Graph mGraph = new Graph();
+
+	Graph_Algo grap = new Graph_Algo();
 	
 	CPU ai_cpu;
 	public AutoAlgo1(Map realMap) {
@@ -63,8 +59,7 @@ public class AutoAlgo1 {
 	public void play() {
 		drone.play();
 		ai_cpu.play();
-		grap= new Graph_Algo();
-		}
+	}
 
 	
 	public void update(int deltaTime) {
@@ -205,47 +200,50 @@ public class AutoAlgo1 {
 		}
 		g.setColor(c);
 	}
-
+	
 	public void paintPoints(Graphics g) {
-		for (int next : this.important_point.keySet()){
-			node p = important_point.get(next);
-//			System.out.println("important_point"+important_point.size());
-//			System.out.println("ID NODE:"+next+"--left--"+important_point.get(next).getImportant_pointleft()+"--Rigt--"+important_point.get(next).getImportant_pointRigt());
-//			g.setColor(Color.GREEN);
-//			g.setColor(Color.red);
-			g.drawOval((int) p.getLocation().x() + (int) drone.startPoint.x - 10, (int) p.getLocation().y() + (int) drone.startPoint.y - 10, 20, 20);
+		for(int i=0;i<points.size();i++) {
+			Point p = points.get(i);
+			g.drawOval((int)p.x + (int)drone.startPoint.x - 10, (int)p.y + (int)drone.startPoint.y-10, 20, 20);
 		}
-
 	}
+
+	public void paintPoints2(Graphics g) {
+		for (int next : this.important_point.keySet()){
+			node_data p = important_point.get(next);
+			g.setColor(Color.red);
+			g.drawOval((int) p.getLocation().x() + (int) drone.startPoint.x - 10, (int) p.getLocation().y() + (int) drone.startPoint.y - 10, 20, 20);
+			g.setColor(Color.DARK_GRAY);
+		}
+	}
+	
 	public void paint(Graphics g) {
 		if(SimulationWindow.toogleRealMap) {
 			drone.realMap.paint(g);
 		}
-
+		
 		paintBlindMap(g);
 		paintPoints(g);
+		paintPoints2(g);
 		drone.paint(g);
+		
+		
 	}
-	String flag="no";
-	String flag2="no";
-	private node Last_suspicious_point =null;
+	
 	boolean is_init = true;
 	double lastFrontLidarDis = 0;
 	boolean isRotateRight = false;
-	double Rightchanged = 0;
-	double Leftchanged = 0;
+	double changedRight = 0;
+	double changedLeft = 0;
 	boolean tryToEscape = false;
 	int leftOrRight = 1;
-	private Graph_Algo grap= new Graph_Algo();
-	private node	ran = null;
-	private node	ran2=null;
-	Iterator connectedNode;
-	private HashMap<Integer,node> important_point = new HashMap<Integer,node>();
+	
+
 	double max_rotation_to_direction = 20;
 	boolean  is_finish = true;
 	boolean isLeftRightRotationEnable = true;
-	private node_data ran_return_home= new node();
-	private double time;
+	
+	
 	boolean is_risky = false;
 	int max_risky_distance = 150;
 	boolean try_to_escape = false;
@@ -256,225 +254,196 @@ public class AutoAlgo1 {
 	
 	double save_point_after_seconds = 3;
 	
-	double max_distance_between_points = 100;
+	double max_distance_between_points = 45;
 	
 	boolean start_return_home = false;
-	
-	Point init_point;
+	public node_data ran = null;
+	private node_data Last_suspicious_point = null;
+	private node_data Last_suspicious_point2=null;
+	private node ran2 = null;
+	private HashMap<Integer,node_data> important_point = new HashMap<Integer,node_data>();
 
+
+	String flag="no";
+	String flag2="no";
+
+
+	Point init_point;
 	public void ai(int deltaTime) {
-		Lidar lidar = drone.lidars.get(0);
-		Lidar lidar1 = drone.lidars.get(1);
-		Lidar lidar2 = drone.lidars.get(2);
-		if (!SimulationWindow.toogleAI) {
+		if(!SimulationWindow.toogleAI) {
 			return;
 		}
-
-		if (is_init) {
+	
+		
+		if(is_init) {
 			speedUp();
 			Point dronePoint = drone.getOpticalSensorLocation();
 			init_point = new Point(dronePoint);
+			points.add(dronePoint);
+//			mGraph.addVertex(dronePoint);
 			is_init = false;
-			ran = new node(drone.startPoint.x, drone.startPoint.y,0, 0,0,0,System.currentTimeMillis());
-			grap.getAlgoGraph().addNode(ran);
-			Last_suspicious_point = ran;
 		}
-
-		if (isLeftRightRotationEnable) {
+		
+		if(isLeftRightRotationEnable) {
 			//doLeftRight();
 		}
-
-
+		
+		
 		Point dronePoint = drone.getOpticalSensorLocation();
 
+		
+		if(SimulationWindow.return_home) {
 
-		if (SimulationWindow.return_home) {
-			if (ran2 != null) {
-				List<node_data> arr = grap.shortestPath(1, this.ran.getKey());
-				connectedNode = arr.iterator();
-//				System.out.println(arr.size());
-				ran_return_home = (node_data) connectedNode.next();
-				spinBy(ran.getWeight() - 180);
-				this.time=System.currentTimeMillis();
-			}
-//			while (connectedNode.hasNext()){
-			if (connectedNode.hasNext()&&isRotating!=1&&
-					ran_return_home.getTimeold()<System.currentTimeMillis()-time) {
-//				if (ran_return_home.getTimeold() <= System.currentTimeMillis()-time) {
-					System.out.println("ID NEW NODE"+ran_return_home.getKey());
-					ran_return_home = (node_data) connectedNode.next();
-					spinBy(ran.getWeight());
-					time=System.currentTimeMillis();
-//				}
-			}
-				if (ran.getKey() == 1 || Tools.getDistanceBetweenPoints(drone.getOpticalSensorLocation(),drone.startPoint)<50)
-				drone.stop();
-//			}
-//			if (Tools.getDistanceBetweenPoints(getLastPoint(), dronePoint) < max_distance_between_points) {
-//				if (points.size() <= 1 && Tools.getDistanceBetweenPoints(getLastPoint(), dronePoint) < max_distance_between_points / 5) {
-//					speedDown();
-//				} else {
-//					removeLastPoint();
-//				}
-//			}
-		}
-		else if (SimulationWindow.suspicious_point) {
-			///////////////////////////////////
-			if (!(ai_cpu.isPlay) && ran_return_home.getKey() != 1) {
-				drone.play();
-			}
-			if (ran2 != null) {
-				List<node_data> arr = grap.shortestPath(Last_suspicious_point.getKey(), ran.getKey());
-				connectedNode = arr.iterator();
-//				System.out.println(arr.size());
-				ran_return_home = (node_data) connectedNode.next();
-				while (isRotating == 1) {// imitate to open
+			if (Tools.getDistanceBetweenPoints(getLastPoint(), dronePoint) < max_distance_between_points) {
+				if (points.size() <= 1 && Tools.getDistanceBetweenPoints(getLastPoint(), dronePoint) < max_distance_between_points / 5) {
+					speedDown();
+				} else {
+					removeLastPoint();
 				}
-				spinBy(ran_return_home.getWeight() - 180);
 			}
-			if (connectedNode.hasNext() && isRotating != 1 &&
-					ran_return_home.getTimeold() < System.currentTimeMillis() - time) {
-//				if (ran_return_home.getTimeold() <= System.currentTimeMillis()-time) {
-				System.out.println("ID NEW NODE" + ran_return_home.getKey());
-				ran_return_home = (node_data) connectedNode.next();
-				spinBy(ran_return_home.getWeight());
-				time = System.currentTimeMillis();
+		}else if (SimulationWindow.Suspicious_Point) {
+			if (Last_suspicious_point!=null) {
+				if (Tools.getDistanceBetweenPoints(getLastPoint(), dronePoint) < max_distance_between_points) {
+					if (Tools.getDistanceBetweenPoints(Last_suspicious_point.getLocation(), dronePoint) < max_distance_between_points / 5) {
+						important_point.remove(Last_suspicious_point.getKey());
+						Last_suspicious_point=Last_suspicious_point2;
+						SimulationWindow.Suspicious_Point = !SimulationWindow.Suspicious_Point;
+					} else {
+						removeLastPoint();
+					}
+				}
 			}
-			if (ran_return_home.getKey() == Last_suspicious_point.getID() || Tools.getDistanceBetweenPoints(drone.getOpticalSensorLocation(), drone.startPoint) < 50)
-				drone.stop();
+		}else  {
+				if(ran==null){
+					ran=new node(0,0, 0, 0, 0, 0, System.currentTimeMillis());
+					grap.getAlgoGraph().addNode(ran);}
+				else if( Tools.getDistanceBetweenPoints(ran.getLocation(), dronePoint) >=  30) {
+					addNoed(dronePoint, ran.getSpin(), drone.lidars.get(0), drone.lidars.get(1), drone.lidars.get(2), System.currentTimeMillis() - ran.getTimeOfEdge());
+				}
+					if( Tools.getDistanceBetweenPoints(getLastPoint(), dronePoint) >=  max_distance_between_points) {
+						points.add(dronePoint);
+			}
 		}
-
-		/////////////////////////
-		else {
-			if (Tools.getDistanceBetweenPoints(getLastPoint(), dronePoint) >= max_distance_between_points) {
-				points.add(dronePoint);
-			}
-		}
-
-
-
-		if (!is_risky) {
-//			Lidar lidar = drone.lidars.get(0);
-			if (lidar.current_distance <= max_risky_distance) {
+	
+		
+		
+		if(!is_risky) {
+			Lidar lidar = drone.lidars.get(0);
+			if(lidar.current_distance <= max_risky_distance ) {
 				is_risky = true;
 				risky_dis = lidar.current_distance;
-
+				
 			}
-
-
-//			Lidar lidar1 = drone.lidars.get(1);
-			if (lidar1.current_distance <= max_risky_distance / 3) {
+			
+			
+			Lidar lidar1 = drone.lidars.get(1);
+			if(lidar1.current_distance <= max_risky_distance/3 ) {
 				is_risky = true;
 			}
-
-//			Lidar lidar2 = drone.lidars.get(2);
-			if (lidar2.current_distance <= max_risky_distance / 3) {
+			
+			Lidar lidar2 = drone.lidars.get(2);
+			if(lidar2.current_distance <= max_risky_distance/3 ) {
 				is_risky = true;
 			}
-
+			
 		} else {
-			if (!try_to_escape) {
+			if(!try_to_escape) {
 				try_to_escape = true;
-//				Lidar lidar1 = drone.lidars.get(1);
+				Lidar lidar1 = drone.lidars.get(1);
 				double a = lidar1.current_distance;
-
-//				Lidar lidar2 = drone.lidars.get(2);
+				
+				Lidar lidar2 = drone.lidars.get(2);
 				double b = lidar2.current_distance;
-
-
+				
+				
+				
 				int spin_by = max_angle_risky;
-
-				if (a > 270 && b > 270) {
+			
+			
+				
+				if(a > 270 && b > 270) {
 					is_lidars_max = true;
 					Point l1 = Tools.getPointByDistance(dronePoint, lidar1.degrees + drone.getGyroRotation(), lidar1.current_distance);
 					Point l2 = Tools.getPointByDistance(dronePoint, lidar2.degrees + drone.getGyroRotation(), lidar2.current_distance);
 					Point last_point = getAvgLastPoint();
-					double dis_to_lidar1 = Tools.getDistanceBetweenPoints(last_point, l1);
-					double dis_to_lidar2 = Tools.getDistanceBetweenPoints(last_point, l2);
-
-					if (SimulationWindow.return_home) {
-						if (Tools.getDistanceBetweenPoints(getLastPoint(), dronePoint) < max_distance_between_points) {
+					double dis_to_lidar1 = Tools.getDistanceBetweenPoints(last_point,l1);
+					double dis_to_lidar2 = Tools.getDistanceBetweenPoints(last_point,l2);
+					
+					if(SimulationWindow.return_home) {
+						if( Tools.getDistanceBetweenPoints(getLastPoint(), dronePoint) <  max_distance_between_points) {
 							removeLastPoint();
 						}
-					} else {
-						if (Tools.getDistanceBetweenPoints(getLastPoint(), dronePoint) >= max_distance_between_points) {
+					} else if (SimulationWindow.Suspicious_Point) {
+						if( Tools.getDistanceBetweenPoints(getLastPoint(), dronePoint) <  max_distance_between_points) {
+							removeLastPoint();
+						}
+					}else {
+						if( Tools.getDistanceBetweenPoints(getLastPoint(), dronePoint) >=  max_distance_between_points) {
 							points.add(dronePoint);
+							if( Tools.getDistanceBetweenPoints(ran.getLocation(), dronePoint) >=  max_distance_between_points) {
+								if(ran==null){
+									ran=new node(0,0, 0, 0, 0, 0, System.currentTimeMillis());
+									grap.getAlgoGraph().addNode(ran);}
+								else addNoed(dronePoint, ran.getSpin(), drone.lidars.get(0), drone.lidars.get(1), drone.lidars.get(2), System.currentTimeMillis() - ran.getTimeOfEdge());
+							}
 						}
 					}
-
+					
 					spin_by = 90;
 
-					if (SimulationWindow.return_home) {
+					if(SimulationWindow.return_home) {
 						spin_by *= -1;
 					}
-
-
-					if (dis_to_lidar1 < dis_to_lidar2) {
-
-						spin_by *= (-1);
+					
+					
+					if(dis_to_lidar1 < dis_to_lidar2) {
+						
+						spin_by *= (-1 ); 
 					}
 				} else {
-
-
-					if (a < b) {
-						spin_by *= (-1);
+					
+					
+					if(a < b ) {
+						spin_by *= (-1 ); 
 					}
 				}
-				int finalSpin_by = spin_by;
-				if (ran2 != null) {
-
-					if ((ran.getRight() < lidar2.current_distance))
-//							&& ((drone.startPoint.x-ran.getLocation().x())>(drone.startPoint.y-ran.getLocation().y())))
-						flag = "Rigt";
-					else
-						flag = "no";
-					 if ((ran.getLeft() < lidar1.current_distance))
-//							 && ((drone.startPoint.x-ran.getLocation().x())>(drone.startPoint.y-ran.getLocation().y())))
-						 flag2 = "Left";
-					 else
-						 flag2 = "no";
-
-					checkimporNoed(finalSpin_by);
-				}
-
-				spinBy(spin_by, true, new Func() {
-					@Override
-					public void method() {
-						try_to_escape = false;
-						is_risky = false;
-					}
+				ran.setSpin(spin_by);
+				spinBy(spin_by,true,new Func() { 
+						@Override
+						public void method() {
+							try_to_escape = false;
+							is_risky = false;
+						}
 				});
 
-
-				if ((int) ran.getWeight() != finalSpin_by && System.currentTimeMillis()-ran.time>2222 && !SimulationWindow.return_home) {
-					System.out.println("addNoed");
-					addNoed(dronePoint, finalSpin_by, lidar, lidar1, lidar2,System.currentTimeMillis()-ran.time);
+				if (ran2 != null) {
+					if (Math.abs(ran.getRight() - lidar2.current_distance) > 250 &&
+							ran.getRight() != 0 && lidar2.current_distance != 0 &&
+							lidar2.current_distance > 300) {
+						flag = "Rigt";
+					} else {
+						flag = "no";
+					}
+					if (Math.abs(ran.getLeft() - lidar1.current_distance) > 250
+							&& ran.getLeft() != 0 && lidar1.current_distance != 0 &&
+							lidar1.current_distance > 300) {
+						flag2 = "Left";
+					} else {
+						flag2 = "no";
+					}
+					checkimporNoed();
 				}
 			}
 		}
-}
-
-	private void checkimporNoed(int finalSpin_by) {
-		if (Math.abs(Last_suspicious_point.getLocation().distance2D(Last_suspicious_point.getLocation(), ran.getLocation())) > 35) {
-			important_point.put(ran.getKey(), ran);
-			Last_suspicious_point = ran;
+		if (SimulationWindow.initGraph){
+		grap.save("text1");
+		Graph_Algo algo2 = new Graph_Algo();
+		algo2.init("text1");
+		System.out.println(algo2.toString());
+//			grap=new Graph_Algo(file_name);
 		}
 	}
-
-	private void addNoed(Point dronePoint, int finalSpin_by, Lidar lidar, Lidar lidar1, Lidar lidar2,double v) {
-		ran2 = new node(dronePoint.x,dronePoint.y, finalSpin_by, lidar.current_distance, lidar1.current_distance, lidar2.current_distance,v);
-//		System.out.println("finalSpin_by"+finalSpin_by);
-//		System.out.println("ran"+ran.toString());
-//		System.out.println("ran2"+ran2.toString());
-		grap.getAlgoGraph().addNode(ran2);
-		grap.getAlgoGraph().connect(ran.getKey(), ran2.getKey(), Point3D.distance2D(ran.getLocation(), ran2.getLocation()));
-			ran2.setImportant_pointRigt(flag.toString());
-			flag = "no";
-			ran2.setImportant_pointleft(flag2.toString());
-			flag2 = "no";
-		ran=ran2;
-	}
-
+	
 	int counter = 0;
 	
 	public void doLeftRight() {
@@ -491,8 +460,33 @@ public class AutoAlgo1 {
 			});
 		}
 	}
-	
-	
+
+	private void checkimporNoed() {
+		if (Last_suspicious_point== null){Last_suspicious_point=ran;Last_suspicious_point2=Last_suspicious_point;}
+		if (Math.abs(Last_suspicious_point.getLocation().distance2D(Last_suspicious_point.getLocation(), ran.getLocation())) > 50) {
+			important_point.put(ran.getKey(), ran);
+			if (Last_suspicious_point.getKey()!=Last_suspicious_point2.getKey()){
+				Last_suspicious_point2=Last_suspicious_point;}
+			Last_suspicious_point = ran;
+		}
+	}
+
+	public synchronized void addNoed(Point dronePoint, int finalSpin_by, Lidar lidar, Lidar lidar1, Lidar lidar2,double v) {
+		ran2 = new node(dronePoint.x,dronePoint.y, finalSpin_by, lidar.current_distance, lidar1.current_distance, lidar2.current_distance,v);
+		System.out.println("finalSpin_by"+finalSpin_by);
+		System.out.println("ran"+ran.toString());
+		System.out.println("ran2"+ran2.toString());
+		grap.getAlgoGraph().addNode(ran2);
+		if (ran.getKey()!=0)
+			grap.getAlgoGraph().connect(ran.getKey(), ran2.getKey(),Tools.getDistanceBetweenPoints(ran.getLocation(),ran2.getLocation()));
+		ran2.setImportant_pointRigt(flag.toString());
+		flag = "no";
+		ran2.setImportant_pointleft(flag2.toString());
+		flag2 = "no";
+		System.out.println("ran"+ran.toString());
+		System.out.println("ran2"+ran2.toString());
+		ran=ran2;
+	}
 	double lastGyroRotation = 0;
 	public void updateRotating(int deltaTime) {
 		
@@ -616,69 +610,5 @@ public class AutoAlgo1 {
 		return new Point((p1.x + p2.x) /2, (p1.y + p2.y) /2);
 	}
 	
-/*
-	public  Thread suspicious_point= new Thread() {
-		public void run(){
-			System.out.println(ai_cpu.isPlay);System.out.println("ggggg");
-			if (ran2 != null) {
-				List<node_data> arr = grap.shortestPath(Last_suspicious_point.getKey(), ran.getKey());
-				connectedNodesuspicious = arr.iterator();
-				System.out.println(arr.size());
-				ran2 = null;
-				ran_return_home = (node_data) connectedNodesuspicious.next();
-				while (isRotating==1) {// imitate to open
-				}
-				spinBy(finalSpin_by - 180);
-				time=System.currentTimeMillis()+300;
-			}
-			if (connectedNodesuspicious.hasNext()) {
-				if (ran_return_home.getTimeold() <= System.currentTimeMillis()-time) {
-					if (Tools.getDistanceBetweenPoints(ran_return_home.getLocation(),drone.getOpticalSensorLocation())<max_distance_between_points/5){
-						System.out.println("ID NEW NODE"+ran_return_home.getKey());
-						ran_return_home = (node_data) connectedNodesuspicious.next();
-						System.out.println("getWeight"+ran.getWeight());
-						while (isRotating==1) {// imitate to open
-						}
-						spinBy(ran.getWeight());
-						time=System.currentTimeMillis();
-					}
-					if (ran_return_home.getKey() == 1)
-						spinBy(ran.getWeight()-180);
-					SimulationWindow.suspicious_point=!SimulationWindow.suspicious_point;
-					important_point.remove(ran_return_home.getKey());
 
-				}
-			}
-		}
-	};
-	 public  Thread returnHome = new Thread() {
-		public void run(){
-			System.out.println(ai_cpu.isPlay);System.out.println("ggggg");
-			if (!(ai_cpu.isPlay) && ran_return_home.getKey() != 1) {drone.play();}
-						if (ran2 != null) {
-				List<node_data> arr = grap.shortestPath(1, ran.getKey());
-				connectedNode = arr.iterator();
-				System.out.println(arr.size());
-				ran2 = null;
-				ran_return_home = (node_data) connectedNode.next();
-				while (isRotating==1) {// imitate to open
-				}
-				spinBy(finalSpin_by - 180);
-				time=System.currentTimeMillis()+300;
-			}
-			if (connectedNode.hasNext()) {
-				if (ran_return_home.getTimeold() <= System.currentTimeMillis()-time) {
-				if (Tools.getDistanceBetweenPoints(ran_return_home.getLocation(),drone.getOpticalSensorLocation())<max_distance_between_points/5){
-					System.out.println("ID NEW NODE"+ran_return_home.getKey());
-					ran_return_home = (node_data) connectedNode.next();
-					System.out.println("getWeight"+ran.getWeight());
-                   while (isRotating==1) {// imitate to open
-                   	 }
-					spinBy(ran.getWeight());
-					time=System.currentTimeMillis();
-				}
-			if (ran_return_home.getKey() == 1) drone.stop();}}
-		}
-	};
-*/
 }

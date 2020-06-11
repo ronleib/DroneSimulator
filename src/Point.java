@@ -18,10 +18,7 @@ public class Point {
 		x = 0;
 		y = 0;
 	}
-//	public boolean miss(Point y){
-//		double checkerX
-
-//	}
+	
 	@Override
 	public String toString() {
 		DecimalFormat df = new DecimalFormat("#.###");

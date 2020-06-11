@@ -29,7 +29,8 @@ public class SimulationWindow {
 
 	public static JLabel info_label;
 	public static boolean return_home = false;
-	public static boolean suspicious_point = false;
+	public static boolean Suspicious_Point=false;
+	public static boolean initGraph = false;
 	boolean toogleStop = true;
 	private void initialize() {
 		frame = new JFrame();
@@ -215,34 +216,32 @@ public class SimulationWindow {
 		 * RETURN TO HOME
 		 */
 
-
 		JButton returnBtn = new JButton("Return Home");
 		returnBtn.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
-			{
-				return_home = !return_home;
-				algo1.speedDown();
-				algo1.spinBy(-180, true, new Func() {
-					@Override
-					public void method() {
-						algo1.speedUp();
-					}
-				});
-			}
+			  public void actionPerformed(ActionEvent e)
+			  {
+				  return_home = !return_home;
+				  algo1.speedDown();
+				  algo1.spinBy(180, true, new Func() {
+						@Override
+						public void method() {
+							algo1.speedUp();
+						}
+					});
+			  }
 		});
-		returnBtn.setBounds(900, 500, 100, 50);
+		returnBtn.setBounds(900, 500, 150, 50);
 		frame.getContentPane().add(returnBtn);
-
-
-		JButton returnBtn2 = new JButton("Go to a suspicious point");
-		returnBtn.addActionListener(new ActionListener()
+		
+		JButton Suspicious = new JButton("Go_to_Suspicious_Point");
+		Suspicious.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				suspicious_point = !suspicious_point;
+				Suspicious_Point = !Suspicious_Point;
 				algo1.speedDown();
-				algo1.spinBy(-180, true, new Func() {
+				algo1.spinBy(180, true, new Func() {
 					@Override
 					public void method() {
 						algo1.speedUp();
@@ -250,22 +249,41 @@ public class SimulationWindow {
 				});
 			}
 		});
-		returnBtn2.setBounds(700, 500, 100, 60);
-		frame.getContentPane().add(returnBtn2);
-
-		info_label = new JLabel();
-		info_label.setBounds(700, 500, 300, 200);
-		frame.getContentPane().add(info_label);
+		Suspicious.setBounds(500, 500, 200, 50);
+		frame.getContentPane().add(Suspicious);
 
 		/*
-		 * Info label
+		 * Info label 
 		 */
-
-
+		JButton Graph = new JButton("initGraph");
+		Graph.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if(initGraph) {
+			CPU.stopAllCPUS();
+		} else {
+			CPU.resumeAllCPUS();
+		}
+				initGraph = !initGraph;
+		}
+		});
+		Graph.setBounds(500, 560, 100, 50);
+		frame.getContentPane().add(Graph);
+		
+		info_label = new JLabel();
+		info_label.setBounds(1300, 500, 300, 200);
+		frame.getContentPane().add(info_label);
+		
+		/*
+		 * Info label 
+		 */
+		
+		
 		info_label2 = new JLabel();
 		info_label2.setBounds(800, 450, 300, 200);
 		frame.getContentPane().add(info_label2);
-
+		
 		main();
 	}
 	public JLabel info_label2;
@@ -284,7 +302,7 @@ public class SimulationWindow {
 				new Point(84,73),
 				new Point(92,100)};
 		
-		Map map = new Map("/home/ron/Desktop/YEARINSEMESTERB/ROBOTIKA/EX3/DroneSimulator/Maps/p1" + map_num + ".png",startPoints[map_num-1]);
+		Map map = new Map("/home/ron/Downloads/DroneSimulator-master/Maps/p1" + map_num + ".png",startPoints[map_num-1]);
 		
 		algo1 = new AutoAlgo1(map);
 		

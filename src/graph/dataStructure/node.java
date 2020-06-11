@@ -16,7 +16,7 @@ import java.util.Comparator;
 public class node implements node_data {
     private static int nextFreeID;
     private Point3D point;
-    private int ID;
+    private  int ID;
     private double weight;
     private int tag=-1; // the temp value of the node we came from
     private node hisoty;
@@ -24,25 +24,35 @@ public class node implements node_data {
     private String important_pointRigt="no";
     private  String info;
     public  double Straight,Left,Right;
+    public int spin;
+    public double time;
+    public double timeOfEdge;
 
     public double getStraight() {
         return Straight;
+    }
+    public void setStraight(double s) { Straight=s; }
+
+    public int getSpin() {
+        return spin;
+    }
+    public void setSpin(int x) {
+        spin=x;
     }
 
     public double getLeft() {
         return Left;
     }
+    public void setLeft(double Left) { this.Left=Left;}
 
     public double getRight() {
         return Right;
     }
+    public void setRight(double Right) { this.Right=Right;}
 
-    public double getTimeold() {
-        return timeold;
-    }
+    public double getTimeOfEdge()      { return timeOfEdge; }
+    public void setTimeOfEdge(int Time2){timeOfEdge=Time2;}
 
-    public double time;
-    public double timeold;
 
     /**
      * an empty constructor that set the ID with a static field of ID
@@ -52,7 +62,7 @@ public class node implements node_data {
      */
     public node() {
         this.ID =nextFreeID;
-        nextFreeID++; // move the conter up
+//        nextFreeID++; // move the conter up
         this.point = new Point3D(0, 0, 0);
         this.weight = 0;
     }
@@ -66,16 +76,16 @@ public class node implements node_data {
      * @param l the drone.lidars Left
      * @param r the drone.lidars Right
      */
-    public node(double x, double y, double weight,double s,double l ,double r,double v) {
+    public node(double x, double y, int weight,double s,double l ,double r,double v) {
         this.ID = nextFreeID;
         nextFreeID++; // move the conter up
         this.point = new Point3D(x, y);
-        this.weight = weight;
+        this.spin = weight;
         Straight=s;
         Left=l;
         Right=r;
         time=System.currentTimeMillis();
-        timeold =v;
+        timeOfEdge =v;
     }
 
     /**
@@ -86,7 +96,7 @@ public class node implements node_data {
      */
     public node(double x, double y, double weight) {
         this.ID = nextFreeID;
-        nextFreeID++; // move the conter up
+//        nextFreeID++; // move the conter up
         this.point = new Point3D(x, y);
         this.weight = weight;
 
@@ -116,12 +126,9 @@ public class node implements node_data {
      * @param y the y coordinate
      */
     public node(double x, double y) {
-        this.ID = nextFreeID;
-        nextFreeID++; // move the conter up
+//        nextFreeID++; // move the conter up
         this.point = new Point3D(x, y);
         this.weight =0;
-
-
     }
 
     /**
@@ -311,31 +318,13 @@ public class node implements node_data {
 
     @Override
     public String toString() {
-        String all="node{" +
+        String all="||node{" +
                 ", ID=" + ID +
-                "point="+point.toString()+
-                '}';
+                ",point="+point.toString()+
+                ",spind="+spin+
+                "||}";
 
         return all;
-    }
-
-    public static void main(String[] args) {
-        DGraph test = new DGraph();
-        node_data zero = new node(800,600,0,0);
-        node_data one = new node(900,300,1,0);
-        node_data two = new node(1300,786,2,0);
-        node_data three = new node(252,162,3,0);
-        node_data four = new node(350,100,4,0);
-        node_data five = new node(55,220,5,0);
-        test.addtoGraph(zero,one,true,true,50,50);
-        test.addtoGraph(zero,two,true,true,30,50);
-        test.addtoGraph(zero,three,true,true,300,300);
-        test.addtoGraph(one,two,true,true,30,50);
-        test.addtoGraph(three,four,true,true,30,30);
-        test.addtoGraph(two,three,true,true,10,10);
-        test.addtoGraph(zero,five,true,true,100000,100000);
-        test.addtoGraph(four,five,true,true,10,10);
-   //     Gui.drawGraph(test);
     }
 
     /**

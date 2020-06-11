@@ -57,6 +57,21 @@ public interface node_data {
 	 */
 	public void setTag(int t);
 
-	public double getTimeold();
+
+	public int getSpin();
+	public void setSpin(int x);
+
+	public double getStraight();
+	public void setStraight(double s);
+
+	public double getLeft();
+	public void setLeft(double Left);
+
+	public double getRight();
+	public void setRight(double Right);
+
+
+	public double getTimeOfEdge();
+	public void setTimeOfEdge(int Time);
 
 }
