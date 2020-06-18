@@ -74,4 +74,5 @@ public interface node_data {
 	public double getTimeOfEdge();
 	public void setTimeOfEdge(int Time);
 
+	public double getTimebildEdge();
 }

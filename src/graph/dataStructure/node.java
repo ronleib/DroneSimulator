@@ -53,6 +53,7 @@ public class node implements node_data {
     public double getTimeOfEdge()      { return timeOfEdge; }
     public void setTimeOfEdge(int Time2){timeOfEdge=Time2;}
 
+    public double getTimebildEdge()      { return time; }
 
     /**
      * an empty constructor that set the ID with a static field of ID
@@ -322,6 +323,8 @@ public class node implements node_data {
                 ", ID=" + ID +
                 ",point="+point.toString()+
                 ",spind="+spin+
+                ",important_pointleft="+important_pointleft+
+                ",important_pointRigt="+important_pointRigt+
                 "||}";
 
         return all;
