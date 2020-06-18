@@ -52,7 +52,7 @@ If you wish to add custom map it has to be black/white pixels- black is wall/obs
 
 In the graph of the points (in black) and the special points (in red):
 
-<a href="http://www.siz.co.il/"><img src="http://up419.siz.co.il/up3/aqwt1xtyxmnm.png" border="0" alt="Screenshot from 2020-06-18 14-55-20" /></a>![](https://i.imgur.com/unUpwsL.png)
+<a href="http://www.siz.co.il/"><img src="http://up419.siz.co.il/up3/aqwt1xtyxmnm.png" border="0" alt="Screenshot from 2020-06-18 14-55-20" /></a>
 
  that he is coming home that he is repeating his points:
 
