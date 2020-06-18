@@ -62,5 +62,4 @@ If you wish to add custom map it has to be black/white pixels- black is wall/obs
 
 <a href="http://www.siz.co.il/"><img src="http://up419.siz.co.il/up3/fzyrwnj2kugn.png" border="0" alt="Screenshot from 2020-06-18 14-55-02" /></a>
 
-![graphexample](https://user-images.githubusercontent.com/28596354/60256218-cc095680-98d9-11e9-8ab4-70c00e863df8.png)
 
