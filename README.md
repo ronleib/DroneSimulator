@@ -57,9 +57,8 @@ If you wish to add custom map it has to be black/white pixels- black is wall/obs
 
 ## that he is coming home that he is repeating his points:
 
-<a href="http://www.siz.co.il/"><img src="http://up419.siz.co.il/up3/aqwt1xtyxmnm.png" border="0" alt="Screenshot from 2020-06-18 14-55-20" /></a>
-
-
 <a href="http://www.siz.co.il/"><img src="http://up419.siz.co.il/up3/fzyrwnj2kugn.png" border="0" alt="Screenshot from 2020-06-18 14-55-02" /></a>
 
+
+<a href="http://www.siz.co.il/"><img src="http://up419.siz.co.il/up3/aqwt1xtyxmnm.png" border="0" alt="Screenshot from 2020-06-18 14-55-20" /></a>
 
